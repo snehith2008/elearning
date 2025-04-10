@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>POLYCET 2025 MCQ Learning App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #ffcc66, #9966cc);
+            padding: 20px;
+            transition: background 0.5s ease;
+            animation: gradientShift 10s infinite alternate;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(128,0,128,0.3);
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+        .container.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            box-shadow: 0 0 25px rgba(128,0,128,0.5);
+        }
+        
+        /* Header image styling */
+        .header-image {
+            width: 100%;
+            height: 250px;
+            object-fit: contain;
+            border-radius: 10px 10px 0 0;
+            margin-bottom: 20px;
+            animation: bounceHeader 2s infinite ease-in-out;
+            transition: transform 0.3s ease;
+        }
+        .header-image:hover {
+            transform: scale(1.05);
+        }
+        @keyframes bounceHeader {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        .heading {
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #4b0082;
+            margin-bottom: 20px;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .heading:hover {
+            transform: scale(1.05);
+            color: #6a0dad;
+        }
+        .question {
+            font-weight: bold;
+            color: #4b0082;
+            font-size: 20px;
+            margin-bottom: 20px;
+            transition: color 0.3s ease, transform 0.3s ease;
+            animation: fadeInQuestion 0.5s ease-in;
+        }
+        @keyframes fadeInQuestion {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .options {
+            margin-top: 20px;
+        }
+        .option {
+            display: block;
+            margin: 15px 0;
+            background-color: #fff3b0;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            animation: slideInOption 0.3s ease-out;
+        }
+        .option:hover {
+            background-color: #ffe066;
+            transform: scale(1.03) translateX(5px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        @keyframes slideInOption {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn {
+            margin: 15px 10px 0 0;
+            padding: 12px 24px;
+            background: #87ceeb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn:hover {
+            background: #00bfff;
+            transform: scale(1.1) rotate(2deg);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        /* Subject icon styling */
+        .subject-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            transition: transform 0.3s ease;
+            animation: bounceIcon 1.5s infinite;
+        }
+        .btn:hover .subject-icon {
+            animation: spinIcon 0.5s ease;
+        }
+        @keyframes bounceIcon {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+        @keyframes spinIcon {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .answer {
+            margin-top: 12px;
+            font-style: italic;
+            color: #4b0082;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(10px);
+        }
+        .answer.visible {
+            opacity: 1;
+            transform: translateY(0);
+            animation: bounceIn 0.5s ease;
+        }
+        @keyframes bounceIn {
+            0% { transform: translateY(10px); opacity: 0; }
+            60% { transform: translateY(-5px); opacity: 1; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .score {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4b0082;
+            margin-bottom: 10px;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .score:hover {
+            color: #6a0dad;
+            transform: scale(1.05);
+        }
+        .hidden {
+            display: none;
+        }
+        .quote {
+            font-style: italic;
+            text-align: center;
+            color: #6a5acd;
+            margin: 10px 0;
+            transition: color 0.3s ease, transform 0.3s ease;
+            animation: fadeInQuote 0.5s ease-in;
+        }
+        .quote:hover {
+            color: #483d8b;
+            transform: translateY(-2px);
+        }
+        @keyframes fadeInQuote {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        /* Decorative image in quiz container */
+        .quiz-decoration {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            bottom: -60px;
+            right: -60px;
+            opacity: 0.3;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            animation: floatDecor 3s infinite ease-in-out;
+        }
+        .quizContainer:hover .quiz-decoration {
+            opacity: 0.5;
+            transform: scale(1.1) rotate(15deg);
+        }
+        @keyframes floatDecor {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="welcome">
+        <img src="https://th.bing.com/th/id/R.67b399a80488aa0de2c843c2de783fab?rik=UeXJjXr3wmOE4Q&riu=http%3a%2f%2fclassroomclipart.com%2fimages%2fgallery%2fClipart%2fSchool%2fstudent_working_at_desk_1127.jpg&ehk=iDQJfOfk3tJFXtje3jEpXpTNWn%2f0Tl%2fmK03S7O9FBrw%3d&risl=&pid=ImgRaw&r=0" alt="Student Studying" class="header-image">
+        <div class="heading">POLYCET 2025</div>
+        <h2 style="text-align: center; color: #800080;">All the Best to All the Aspirants!</h2>
+        <p class="quote">"Success is the sum of small efforts repeated day in and day out."</p>
+        <p class="quote">"Push yourself, because no one else is going to do it for you."</p>
+        <p class="quote">"Believe in yourself and all that you are."</p>
+        <h3 style="text-align: center;">Choose a Subject to Begin:</h3>
+        <div style="text-align: center;">
+            <button class="btn" onclick="startQuiz('mathematics')">
+                <img src="https://th.bing.com/th/id/OIP._iDTI_mqlV-ThRvF9g-pSgHaFU?rs=1&pid=ImgDetMain" alt="Math Icon" class="subject-icon">Mathematics
+            </button>
+            <button class="btn" onclick="startQuiz('physics')">
+                <img src="https://c8.alamy.com/comp/EX2F44/a-cartoon-blue-atom-smiling-and-happy-EX2F44.jpg" alt="Physics Icon" class="subject-icon">Physics
+            </button>
+            <button class="btn" onclick="startQuiz('chemistry')">
+                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=24&h=24&q=80" alt="Chemistry Icon" class="subject-icon">Chemistry
+            </button>
+            <button class="btn" onclick="startQuiz('biology')">
+                <img src="https://static.vecteezy.com/system/resources/previews/016/132/407/large_2x/microscope-icon-in-comic-style-laboratory-magnifier-cartoon-illustration-on-isolated-background-biology-instrument-splash-effect-sign-business-concept-vector.jpg" alt="Biology Icon" class="subject-icon">Biology
+            </button>
+        </div>
+    </div>
+
+    <div class="container hidden" id="quizContainer">
+        <div class="score" id="scoreBar">Score: 0</div>
+        <div class="heading" id="subjectTitle"></div>
+        <div id="quiz"></div>
+        <button class="btn" onclick="prevQuestion()">Previous</button>
+        <button class="btn" onclick="submitAnswer()">Submit</button>
+        </div>
+
+  <script>
+        const questionsBySubject = {
+  mathematics: [
+    { question: "If x = √5 + 2, then x - 1/x is:", options: ["A) 4", "B) 3√5", "C) √5", "D) 3/5"], answer: "C" },
+    { question: "The LCM of 72 and 120 is:", options: ["A) 360", "B) 240", "C) 480", "D) 180"], answer: "A" },
+    { question: "The sum of all two-digit numbers divisible by 5 is:", options: ["A) 945", "B) 950", "C) 960", "D) 965"], answer: "B" },
+    { question: "3 1/3 ÷ 5/6 =", options: ["A) 4", "B) 3", "C) 2", "D) 6"], answer: "A" },
+    { question: "0.4% of 750 is:", options: ["A) 3", "B) 2", "C) 1.5", "D) 3.5"], answer: "A" },
+    { question: "(3x² - 2x + 1) - (x² + x - 5) =", options: ["A) 2x² - 3x + 6", "B) 2x² - 3x + 1", "C) 2x² + 3x + 6", "D) 4x² - x - 4"], answer: "A" },
+    { question: "x² - (a + b)x + ab = 0 has roots:", options: ["A) a, b", "B) -a, -b", "C) a + b, ab", "D) a - b, b - a"], answer: "A" },
+    { question: "(a + b)² - (a - b)² =", options: ["A) 4ab", "B) 2ab", "C) a² - b²", "D) a² + b²"], answer: "A" },
+    { question: "Value of 256^(-0.25) is:", options: ["A) 1/4", "B) 1/16", "C) 4", "D) 16"], answer: "B" },
+    { question: "tan 60° - cot 30° =", options: ["A) 0", "B) 1", "C) -1", "D) 2"], answer: "A" },
+    { question: "Angle corresponding to 11/12 of a circle:", options: ["A) 330°", "B) 360°", "C) 180°", "D) 90°"], answer: "A" },
+    { question: "Area of square with area 144 sq.cm:", options: ["A) 12 cm", "B) 14 cm", "C) 16 cm", "D) 18 cm"], answer: "A" },
+    { question: "Perimeter of semicircle with radius 14 cm:", options: ["A) 44 cm", "B) 71 cm", "C) 58 cm", "D) 22 cm"], answer: "C" },
+    { question: "Surface area of cube with side 4 cm:", options: ["A) 96 cm²", "B) 64 cm²", "C) 128 cm²", "D) 144 cm²"], answer: "A" },
+    { question: "Circumference of circle with diameter 14 cm:", options: ["A) 44 cm", "B) 22 cm", "C) 28 cm", "D) 36 cm"], answer: "A" },
+    { question: "Which is a rational number?", options: ["A) √3", "B) π", "C) 2/3", "D) √2"], answer: "C" },
+    { question: "Perimeter of square is 32 cm. Area?", options: ["A) 64 cm²", "B) 32 cm²", "C) 128 cm²", "D) 16 cm²"], answer: "A" },
+    { question: "4/5 ÷ 2/3 =", options: ["A) 6/5", "B) 5/6", "C) 8/15", "D) 12/10"], answer: "A" },
+    { question: "Mean of 2, 4, 6, 8, 10:", options: ["A) 5", "B) 6", "C) 7", "D) 8"], answer: "B" },
+    { question: "Median of 3, 7, 5, 9, 11:", options: ["A) 5", "B) 7", "C) 9", "D) 11"], answer: "B" },
+
+    { question: "If 15 workers complete a work in 12 days, how many workers are required to complete it in 10 days?", options: ["A) 18", "B) 16", "C) 14", "D) 12"], answer: "A" },
+    { question: "The simple interest on Rs. 5000 at 6% per annum for 2 years is:", options: ["A) 600", "B) 500", "C) 700", "D) 800"], answer: "A" },
+    { question: "Find the compound interest on Rs. 4000 at 5% p.a. for 2 years:", options: ["A) 410", "B) 405", "C) 400", "D) 420"], answer: "B" },
+    { question: "a² - 2ab + b² =", options: ["A) (a + b)²", "B) (a - b)²", "C) a² + b²", "D) ab"], answer: "B" },
+    { question: "The number of edges of a cube is:", options: ["A) 8", "B) 10", "C) 12", "D) 6"], answer: "C" },
+    { question: "The volume of a cube with edge 5 cm is:", options: ["A) 125 cm³", "B) 25 cm³", "C) 150 cm³", "D) 100 cm³"], answer: "A" },
+    { question: "In a triangle, the sum of three angles is:", options: ["A) 360°", "B) 90°", "C) 180°", "D) 270°"], answer: "C" },
+    { question: "The value of √144 is:", options: ["A) 11", "B) 13", "C) 12", "D) 14"], answer: "C" },
+    { question: "If x = 2, y = 3, then 2x + y² =", options: ["A) 13", "B) 12", "C) 11", "D) 10"], answer: "A" },
+    { question: "The square root of 0.01 is:", options: ["A) 0.001", "B) 0.1", "C) 0.01", "D) 1"], answer: "B" },
+    { question: "The multiplicative inverse of 5/7 is:", options: ["A) 2/5", "B) 7/5", "C) 5/2", "D) 7/2"], answer: "B" },
+    { question: "The mode of 2, 4, 4, 6, 6, 6, 8 is:", options: ["A) 4", "B) 6", "C) 2", "D) 8"], answer: "B" },
+    { question: "(x + 1)(x - 1) =", options: ["A) x² + 1", "B) x² - 1", "C) x² - x", "D) x² + x"], answer: "B" },
+    { question: "Area of a rectangle with length 12 cm and breadth 8 cm is:", options: ["A) 80 cm²", "B) 96 cm²", "C) 100 cm²", "D) 90 cm²"], answer: "B" },
+    { question: "A shopkeeper gives 10% discount on Rs. 200. The selling price is:", options: ["A) 190", "B) 180", "C) 170", "D) 160"], answer: "B" },
+    { question: "The square of 15 is:", options: ["A) 215", "B) 220", "C) 225", "D) 230"], answer: "C" },
+    { question: "A number which is divisible by both 3 and 5 is:", options: ["A) 15", "B) 9", "C) 10", "D) 8"], answer: "A" },
+    { question: "The cube root of 27 is:", options: ["A) 9", "B) 3", "C) 2", "D) 6"], answer: "B" },
+    { question: "Which of the following is an even number?", options: ["A) 13", "B) 19", "C) 22", "D) 17"], answer: "C" },
+    { question: "The successor of 99 is:", options: ["A) 98", "B) 97", "C) 100", "D) 101"], answer: "C" },
+
+    { question: "The HCF of 18 and 24 is:", options: ["A) 6", "B) 3", "C) 12", "D) 9"], answer: "A" },
+    { question: "20% of 250 is:", options: ["A) 25", "B) 50", "C) 75", "D) 40"], answer: "D" },
+    { question: "The largest 2-digit prime number is:", options: ["A) 97", "B) 89", "C) 99", "D) 91"], answer: "A" },
+    { question: "The value of (5)² + (4)² =", options: ["A) 41", "B) 49", "C) 25", "D) 29"], answer: "A" },
+    { question: "The mean of first five natural numbers is:", options: ["A) 2", "B) 3", "C) 4", "D) 5"], answer: "B" },
+    { question: "The next term in the sequence 2, 4, 8, 16, … is:", options: ["A) 24", "B) 30", "C) 32", "D) 36"], answer: "C" },
+    { question: "0.25 is equal to:", options: ["A) 1/2", "B) 1/3", "C) 1/4", "D) 1/5"], answer: "C" },
+    { question: "Perimeter of a square of side 5 cm is:", options: ["A) 10 cm", "B) 20 cm", "C) 25 cm", "D) 15 cm"], answer: "B" },
+    { question: "Area of triangle with base 10 cm and height 5 cm:", options: ["A) 25 cm²", "B) 20 cm²", "C) 30 cm²", "D) 15 cm²"], answer: "A" },
+    { question: "Which is a multiple of 11?", options: ["A) 99", "B) 100", "C) 90", "D) 88"], answer: "A" },
+    { question: "7 is a factor of:", options: ["A) 20", "B) 28", "C) 33", "D) 36"], answer: "B" },
+    { question: "The square root of 81 is:", options: ["A) 8", "B) 9", "C) 7", "D) 6"], answer: "B" },
+    { question: "The product of 13 and 5 is:", options: ["A) 65", "B) 60", "C) 70", "D) 55"], answer: "A" },
+    { question: "Area of square with side 6 cm:", options: ["A) 30 cm²", "B) 36 cm²", "C) 24 cm²", "D) 12 cm²"], answer: "B" },
+    { question: "If 3 pens cost Rs. 15, cost of 5 pens is:", options: ["A) 20", "B) 25", "C) 30", "D) 35"], answer: "C" },
+    { question: "2³ =", options: ["A) 4", "B) 6", "C) 8", "D) 10"], answer: "C" },
+    { question: "Which of the following is a prime number?", options: ["A) 21", "B) 19", "C) 25", "D) 27"], answer: "B" },
+    { question: "Area of a rectangle = length × _____", options: ["A) Width", "B) Radius", "C) Side", "D) Height"], answer: "A" },
+    { question: "If x = 3, value of x² + 2x + 1:", options: ["A) 16", "B) 14", "C) 13", "D) 10"], answer: "A" },
+    { question: "Volume of a cuboid = length × breadth × _____", options: ["A) Area", "B) Height", "C) Width", "D) Side"], answer: "B" }
+  ],
+            physics: [
+    { question: "The SI unit of force is:", options: ["A) Newton", "B) Joule", "C) Watt", "D) Pascal"], answer: "A" },
+    { question: "Which instrument is used to measure temperature?", options: ["A) Thermometer", "B) Barometer", "C) Hygrometer", "D) Galvanometer"], answer: "A" },
+    { question: "The speed of light in vacuum is:", options: ["A) 3 × 10⁸ m/s", "B) 3 × 10⁶ m/s", "C) 3 × 10⁵ km/h", "D) 3 × 10³ m/s"], answer: "A" },
+    { question: "The unit of work is:", options: ["A) Watt", "B) Newton", "C) Joule", "D) Volt"], answer: "C" },
+    { question: "Which is a non-contact force?", options: ["A) Friction", "B) Tension", "C) Magnetic force", "D) Muscular force"], answer: "C" },
+    { question: "SI unit of power:", options: ["A) Joule", "B) Watt", "C) Newton", "D) Erg"], answer: "B" },
+    { question: "Energy transformation in solar cell:", options: ["A) Heat to light", "B) Light to electrical", "C) Chemical to electrical", "D) Electrical to heat"], answer: "B" },
+    { question: "Sound cannot travel through:", options: ["A) Air", "B) Vacuum", "C) Water", "D) Iron"], answer: "B" },
+    { question: "Device used to break an electric circuit:", options: ["A) Battery", "B) Bulb", "C) Switch", "D) Wire"], answer: "C" },
+    { question: "Which is a conductor?", options: ["A) Plastic", "B) Wood", "C) Copper", "D) Rubber"], answer: "C" },
+    { question: "Force which opposes motion:", options: ["A) Gravity", "B) Muscular", "C) Magnetic", "D) Friction"], answer: "D" },
+    { question: "Red Planet is:", options: ["A) Venus", "B) Mars", "C) Jupiter", "D) Mercury"], answer: "B" },
+    { question: "Image formed by plane mirror:", options: ["A) Real", "B) Inverted", "C) Virtual and erect", "D) Magnified"], answer: "C" },
+    { question: "Phenomenon responsible for echo:", options: ["A) Refraction", "B) Absorption", "C) Reflection", "D) Diffraction"], answer: "C" },
+    { question: "Part of the eye controlling light:", options: ["A) Retina", "B) Lens", "C) Iris", "D) Cornea"], answer: "C" },
+    { question: "1 kilowatt-hour equals:", options: ["A) 1000 J", "B) 3600 J", "C) 3600000 J", "D) 60 J"], answer: "C" },
+    { question: "Current is measured in:", options: ["A) Volts", "B) Amperes", "C) Ohms", "D) Watts"], answer: "B" },
+    { question: "Good conductor of heat:", options: ["A) Glass", "B) Wood", "C) Silver", "D) Plastic"], answer: "C" },
+    { question: "Center of a lens is called:", options: ["A) Radius", "B) Pole", "C) Optical center", "D) Vertex"], answer: "C" },
+    { question: "A force applied causes:", options: ["A) No change", "B) Motion or deformation", "C) Rotation only", "D) Friction only"], answer: "B" },
+    { question: "Gas used in bulbs:", options: ["A) Oxygen", "B) Helium", "C) Nitrogen", "D) Hydrogen"], answer: "C" },
+    { question: "Vibrations per second is:", options: ["A) Wavelength", "B) Frequency", "C) Amplitude", "D) Pitch"], answer: "B" },
+    { question: "Lightning is a form of:", options: ["A) Heat", "B) Magnetic", "C) Electric energy", "D) Sound"], answer: "C" },
+    { question: "Concave mirror, object between mirror and focus:", options: ["A) Real and inverted", "B) Virtual and erect", "C) Real and erect", "D) Diminished"], answer: "B" },
+    { question: "Property of metal to draw into wire:", options: ["A) Ductility", "B) Malleability", "C) Conductivity", "D) Elasticity"], answer: "A" },
+    { question: "SI unit of pressure is:", options: ["A) Newton", "B) Pascal", "C) Joule", "D) Watt"], answer: "B" },
+    { question: "1 horsepower =:", options: ["A) 735 watts", "B) 746 watts", "C) 1000 watts", "D) 100 watts"], answer: "B" },
+    { question: "Instrument to measure current:", options: ["A) Ammeter", "B) Voltmeter", "C) Thermometer", "D) Barometer"], answer: "A" },
+    { question: "Freezing point of water in Celsius:", options: ["A) 0°C", "B) 32°C", "C) 100°C", "D) -1°C"], answer: "A" },
+    { question: "Force = mass × _____", options: ["A) Pressure", "B) Acceleration", "C) Work", "D) Power"], answer: "B" }
+  ],
+  chemistry: [
+    { question: "Chemical formula of lime water:", options: ["A) CaCO₃", "B) Ca(OH)₂", "C) CaO", "D) CaCl₂"], answer: "B" },
+    { question: "Gas evolved during acid + metal reaction:", options: ["A) Hydrogen", "B) Oxygen", "C) Nitrogen", "D) Carbon dioxide"], answer: "A" },
+    { question: "Homogeneous mixture:", options: ["A) Air", "B) Milk", "C) Smoke", "D) Paint"], answer: "A" },
+    { question: "pH of distilled water is:", options: ["A) 7", "B) 9", "C) 4", "D) 1"], answer: "A" },
+    { question: "Chemical formula of common salt:", options: ["A) Na₂CO₃", "B) NaCl", "C) NaOH", "D) NaHCO₃"], answer: "B" },
+    { question: "Gas released when baking soda is heated:", options: ["A) Oxygen", "B) Nitrogen", "C) Carbon dioxide", "D) Hydrogen"], answer: "C" },
+    { question: "Acid turns blue litmus to:", options: ["A) Blue", "B) Green", "C) Yellow", "D) Red"], answer: "D" },
+    { question: "Which is an indicator?", options: ["A) Salt", "B) Sugar", "C) Litmus", "D) Water"], answer: "C" },
+    { question: "Chemical name of vinegar:", options: ["A) Acetic acid", "B) Citric acid", "C) Tartaric acid", "D) Lactic acid"], answer: "A" },
+    { question: "Atomic number of oxygen:", options: ["A) 6", "B) 8", "C) 10", "D) 12"], answer: "B" },
+    { question: "Metal liquid at room temperature:", options: ["A) Iron", "B) Mercury", "C) Lead", "D) Zinc"], answer: "B" },
+    { question: "Most reactive metal:", options: ["A) Copper", "B) Zinc", "C) Potassium", "D) Iron"], answer: "C" },
+    { question: "Non-metal liquid at room temperature:", options: ["A) Carbon", "B) Sulphur", "C) Bromine", "D) Phosphorus"], answer: "C" },
+    { question: "Pencil lead element:", options: ["A) Carbon", "B) Lead", "C) Graphite", "D) Mercury"], answer: "C" },
+    { question: "Thermometer metal:", options: ["A) Zinc", "B) Lead", "C) Mercury", "D) Copper"], answer: "C" },
+    { question: "Acid in lemon:", options: ["A) Acetic", "B) Citric", "C) Tartaric", "D) Lactic"], answer: "B" },
+    { question: "Balloon gas:", options: ["A) Oxygen", "B) Hydrogen", "C) Helium", "D) Nitrogen"], answer: "C" },
+    { question: "Which is an element?", options: ["A) Water", "B) Sugar", "C) Oxygen", "D) Salt"], answer: "C" },
+    { question: "Metal that catches fire in air:", options: ["A) Zinc", "B) Iron", "C) Sodium", "D) Copper"], answer: "C" },
+    { question: "Substance turning turmeric red:", options: ["A) Acid", "B) Water", "C) Base", "D) Salt"], answer: "C" },
+    { question: "Formula of washing soda:", options: ["A) Na₂CO₃", "B) NaHCO₃", "C) NaCl", "D) NaOH"], answer: "A" },
+    { question: "Which is a base?", options: ["A) HCl", "B) NaOH", "C) CH₃COOH", "D) H₂SO₄"], answer: "B" },
+    { question: "Fire extinguisher gas:", options: ["A) Oxygen", "B) Hydrogen", "C) Carbon dioxide", "D) Nitrogen"], answer: "C" },
+    { question: "Rust is compound of:", options: ["A) Copper", "B) Iron", "C) Zinc", "D) Aluminum"], answer: "B" },
+    { question: "Battery acid:", options: ["A) Hydrochloric acid", "B) Sulphuric acid", "C) Nitric acid", "D) Acetic acid"], answer: "B" },
+    { question: "Chalk is:", options: ["A) CaCO₃", "B) CaO", "C) Ca(OH)₂", "D) CaCl₂"], answer: "A" },
+    { question: "Which is not a metal?", options: ["A) Zinc", "B) Copper", "C) Iron", "D) Sulphur"], answer: "D" },
+    { question: "Atomic number of carbon:", options: ["A) 4", "B) 6", "C) 8", "D) 10"], answer: "B" },
+    { question: "Metal in electric wires:", options: ["A) Iron", "B) Copper", "C) Aluminum", "D) Zinc"], answer: "B" },
+    { question: "Which is a chemical change?", options: ["A) Melting of ice", "B) Boiling of water", "C) Burning of paper", "D) Cutting of paper"], answer: "C" }
+  ],           
+biology: [
+  { question: "The process of conversion of sugar into alcohol is called:", options: ["A) Pasteurization", "B) Fermentation", "C) Nitrogen fixation", "D) Carbonation"], answer: "B" },
+  { question: "Which of the following is a communicable disease?", options: ["A) Cancer", "B) Diabetes", "C) Tuberculosis", "D) Asthma"], answer: "C" },
+  { question: "The part of the plant responsible for photosynthesis:", options: ["A) Flower", "B) Leaf", "C) Root", "D) Stem"], answer: "B" },
+  { question: "Identify the non-renewable resource:", options: ["A) Water", "B) Petroleum", "C) Wind", "D) Solar energy"], answer: "B" },
+  { question: "Which organ pumps blood throughout the body?", options: ["A) Brain", "B) Liver", "C) Kidney", "D) Heart"], answer: "D" },
+  { question: "The structural and functional unit of life is:", options: ["A) Tissue", "B) Organ", "C) Cell", "D) Organ system"], answer: "C" },
+  { question: "The vitamin responsible for blood clotting:", options: ["A) Vitamin A", "B) Vitamin B", "C) Vitamin C", "D) Vitamin K"], answer: "D" },
+  { question: "Which part of the body controls all functions?", options: ["A) Heart", "B) Brain", "C) Lungs", "D) Kidney"], answer: "B" },
+  { question: "The excretory organ in humans is:", options: ["A) Heart", "B) Brain", "C) Kidney", "D) Lungs"], answer: "C" },
+  { question: "The largest organ in the human body is:", options: ["A) Heart", "B) Liver", "C) Skin", "D) Brain"], answer: "C" },
+  { question: "Which part of the plant absorbs water?", options: ["A) Flower", "B) Leaf", "C) Stem", "D) Root"], answer: "D" },
+  { question: "The green pigment in plants is:", options: ["A) Haemoglobin", "B) Melanin", "C) Chlorophyll", "D) Cytoplasm"], answer: "C" },
+  { question: "The process by which plants make food:", options: ["A) Respiration", "B) Germination", "C) Photosynthesis", "D) Fermentation"], answer: "C" },
+  { question: "Malaria is caused by:", options: ["A) Bacteria", "B) Virus", "C) Fungus", "D) Protozoa"], answer: "D" },
+  { question: "The disease caused by deficiency of iron:", options: ["A) Scurvy", "B) Rickets", "C) Anaemia", "D) Goitre"], answer: "C" },
+  { question: "Organisms that prepare their own food:", options: ["A) Parasites", "B) Decomposers", "C) Autotrophs", "D) Heterotrophs"], answer: "C" },
+  { question: "Which blood cells fight infections?", options: ["A) RBC", "B) WBC", "C) Platelets", "D) Plasma"], answer: "B" },
+  { question: "Mosquitoes lay eggs in:", options: ["A) Sand", "B) Water", "C) Soil", "D) Leaves"], answer: "B" },
+  { question: "Which part of the eye helps to focus light?", options: ["A) Retina", "B) Cornea", "C) Iris", "D) Lens"], answer: "D" },
+  { question: "Which is an example of a unicellular organism?", options: ["A) Hydra", "B) Amoeba", "C) Earthworm", "D) Fish"], answer: "B" },
+  { question: "The gas taken in during photosynthesis:", options: ["A) Oxygen", "B) Nitrogen", "C) Carbon dioxide", "D) Hydrogen"], answer: "C" },
+  { question: "Blood is transported from heart to body through:", options: ["A) Veins", "B) Arteries", "C) Capillaries", "D) Lymph"], answer: "B" },
+  { question: "The organ that helps in breathing:", options: ["A) Kidney", "B) Heart", "C) Lungs", "D) Liver"], answer: "C" },
+  { question: "The disease caused by iodine deficiency:", options: ["A) Rickets", "B) Scurvy", "C) Goitre", "D) Anaemia"], answer: "C" },
+  { question: "Example of a plant hormone:", options: ["A) Insulin", "B) Thyroxine", "C) Auxin", "D) Estrogen"], answer: "C" },
+  { question: "Organism that decomposes dead matter:", options: ["A) Bacteria", "B) Algae", "C) Virus", "D) Insects"], answer: "A" },
+  { question: "Which is a bacterial disease?", options: ["A) AIDS", "B) Malaria", "C) Typhoid", "D) Influenza"], answer: "C" },
+  { question: "The tube that carries urine from kidney to bladder:", options: ["A) Urethra", "B) Nephron", "C) Ureter", "D) Trachea"], answer: "C" },
+  { question: "Which vitamin is produced in the skin by sunlight?", options: ["A) Vitamin A", "B) Vitamin C", "C) Vitamin D", "D) Vitamin B"], answer: "C" },
+  { question: "Which part of the flower becomes fruit?", options: ["A) Ovary", "B) Stigma", "C) Petal", "D) Sepal"], answer: "A" }
+]
+        };
+        let current = 0;
+        let score = 0;
+        let currentSubject = '';
+        let currentQuestions = [];
+        let userAnswers = [];
+
+        function startQuiz(subject) {
+            currentSubject = subject;
+            currentQuestions = questionsBySubject[subject];
+            current = 0;
+            score = 0;
+            userAnswers = new Array(currentQuestions.length).fill(null);
+            const welcome = document.getElementById("welcome");
+            const quizContainer = document.getElementById("quizContainer");
+            
+            welcome.classList.remove("visible");
+            welcome.classList.add("hidden");
+            quizContainer.classList.remove("hidden");
+            
+            setTimeout(() => {
+                quizContainer.classList.add("visible");
+            }, 10);
+            
+            document.getElementById("subjectTitle").innerText = subject.charAt(0).toUpperCase() + subject.slice(1);
+            updateScore();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = currentQuestions[current];
+            const quizDiv = document.getElementById("quiz");
+            quizDiv.innerHTML = `
+                <div class="question">Q${current + 1}. ${q.question}</div>
+                <div class="options">
+                    ${q.options.map(opt => `
+                        <label class="option">
+                            <input type="radio" name="option" value="${opt[0]}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div id="answer" class="answer"></div>
+            `;
+
+            if (userAnswers[current]) {
+                const opts = document.getElementsByName("option");
+                for (let opt of opts) {
+                    if (opt.value === userAnswers[current]) {
+                        opt.checked = true;
+                        showAnswer();
+                        break;
+                    }
+                }
+            }
+
+            document.querySelector('#quizContainer button:first-child').disabled = current === 0;
+        }
+
+        function submitAnswer() {
+            const options = document.getElementsByName("option");
+            let selected = null;
+            for (const opt of options) {
+                if (opt.checked) {
+                    selected = opt.value;
+                    break;
+                }
+            }
+
+            if (selected === null) {
+                alert("Please select an answer.");
+                return;
+            }
+
+            userAnswers[current] = selected;
+            const correctAnswer = currentQuestions[current].answer;
+            if (selected === correctAnswer) {
+                score++;
+                updateScore();
+            }
+            
+            showAnswer();
+            
+            setTimeout(() => {
+                current++;
+                if (current < currentQuestions.length) {
+                    loadQuestion();
+                } else {
+                    document.getElementById("quiz").innerHTML = `
+                        <h3>Quiz Completed! Final Score: ${score} / ${currentQuestions.length}</h3>
+                    `;
+                    const buttons = document.querySelectorAll('#quizContainer button');
+                    buttons.forEach(button => button.classList.add('hidden'));
+                }
+            }, 1000);
+        }
+
+        function showAnswer() {
+            const answerDiv = document.getElementById("answer");
+            const correctAnswer = currentQuestions[current].answer;
+            const correctOption = currentQuestions[current].options.find(opt => opt[0] === correctAnswer);
+            answerDiv.innerText = `Correct Answer: ${correctOption}`;
+            answerDiv.classList.add("visible");
+            
+            const options = document.getElementsByName("option");
+            options.forEach(opt => opt.disabled = true);
+        }
+
+        function prevQuestion() {
+            if (current > 0) {
+                current--;
+                loadQuestion();
+            }
+        }
+
+        function updateScore() {
+            document.getElementById("scoreBar").innerText = `Score: ${score}`;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("welcome").classList.add("visible");
+        });
+    </script>
+</body>
+</html>
